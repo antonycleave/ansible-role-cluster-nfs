@@ -1,5 +1,10 @@
 ---
 
+- name: Install nfs_server_packages
+  ansible.builtin.package:
+    name: "{{ nfs_server_packages }}"
+    state: present
+
 - name: ensure exported path exists
   file:
     path: "{{ item.get('nfs_export', nfs_export) }}"

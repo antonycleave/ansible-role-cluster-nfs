@@ -29,4 +29,5 @@ nfs_configurations:
       server: false
       clients: false
 
+nfs_server_default:
 ...

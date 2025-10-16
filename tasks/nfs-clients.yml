@@ -1,5 +1,10 @@
 ---
 
+- name: Install nfs_client_packages
+  ansible.builtin.package:
+    name: "{{ nfs_client_packages }}"
+    state: present
+
 - name: check if mount directory exists
   stat:
     path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"
@@ -17,7 +22,7 @@
 - name: mount the filesystem
   mount:
     path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"
-    src: "{{ item.get('nfs_server', nfs_server) }}:{{ item.get('nfs_export', nfs_export) }}"
+    src: "{{ item.get('nfs_server', nfs_server | default( nfs_server_default )) }}:{{ item.get('nfs_export', nfs_export) }}"
     opts: "{{ item['nfs_client_mnt_options'] | default(nfs_client_mnt_options, true) | default(omit, true) }}" # for some reason items.get() here fails with "an incorrect mount option was specified"
     fstype: nfs
     state: "{{ item.get('nfs_client_mnt_state', nfs_client_mnt_state) }}"
