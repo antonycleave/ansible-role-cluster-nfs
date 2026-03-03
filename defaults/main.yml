@@ -30,4 +30,5 @@ nfs_configurations:
       clients: false
 
 nfs_server_default:
+nfs_server_num_threads: "{{ ansible_processor_vcpus * 2 }}" 
 ...

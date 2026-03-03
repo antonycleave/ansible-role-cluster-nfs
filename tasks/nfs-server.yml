@@ -37,11 +37,31 @@
     line: "{{ item.get('nfs_export', nfs_export) }} -{{ item.get('nfs_export_options', nfs_export_options) }} {{ item.get('nfs_export_clients', nfs_export_clients) }}"
   notify: re-export filesystem
 
+- name: nfs-server-threads
+  ansible.builtin.lineinfile:
+    insertafter: "[nfsd]"
+    path:  /etc/nfs.conf
+    line: threads="{{ nfs_server_num_threads }}"
+
 - name: ensure nfs service is running
   service:
     name: nfs-server
     state: started
     enabled: yes
 
+- name: Read current nfsd thread count
+  become: true
+  ansible.builtin.command: cat /proc/fs/nfsd/threads
+  register: nfsd_threads
+  changed_when: false
+
+- name: Set nfsd thread count live (no restart)
+  become: true
+  ansible.builtin.shell: |
+    echo {{ nfs_server_num_threads | int }} > /proc/fs/nfsd/threads
+  args:
+    executable: /bin/bash
+  when: (nfsd_threads.stdout | int) != (nfs_server_num_threads | int)
+  
 - name: flush handlers
   meta: flush_handlers
