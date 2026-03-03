@@ -29,4 +29,6 @@ nfs_configurations:
       server: false
       clients: false
 
+# this is the  ubuntu defaults
+nfs_server_num_threads: "{{ ansible_processor_vcpus * 2 }}" 
 ...
