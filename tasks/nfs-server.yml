@@ -37,11 +37,18 @@
     line: "{{ item.get('nfs_export', nfs_export) }} -{{ item.get('nfs_export_options', nfs_export_options) }} {{ item.get('nfs_export_clients', nfs_export_clients) }}"
   notify: re-export filesystem
 
-- name: nfs-server-threads
-  ansible.builtin.lineinfile:
-    insertafter: "[nfsd]"
+# Write into the [nfsd] section of /etc/nfs.conf. Uses ini_file rather
+# than lineinfile so the value reliably lands under [nfsd] (lineinfile's
+# insertafter treats "[nfsd]" as a regex character class, not a literal
+# section header, and mis-places the line).
+- name: Configure nfsd thread count in /etc/nfs.conf
+  community.general.ini_file:
     path: /etc/nfs.conf
-    line: threads="{{ nfs_server_num_threads }}"
+    section: nfsd
+    option: threads
+    value: "{{ nfs_server_num_threads }}"
+    no_extra_spaces: true
+    mode: "0644"
 
 - name: ensure nfs service is running
   service:
