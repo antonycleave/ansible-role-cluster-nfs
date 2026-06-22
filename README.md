@@ -7,7 +7,10 @@ deployments.
 Requirements
 ------------
 
-None
+The `community.general` collection is required (the client read-ahead task uses
+`community.general.ini_file`). Install it with:
+
+    ansible-galaxy collection install -r requirements.yml
 
 Role Variables
 --------------
@@ -36,12 +39,16 @@ builtin module. Can be one of "absent", "mounted", "present", "unmounted" or
 
 `nfs_enable`: a mapping with keys `server` and `client` - values are bools determining the role of the host.
 
+`nfs_server_num_threads` is the number of `nfsd` threads configured on the NFS server, written to the `[nfsd]` section of `/etc/nfs.conf` and also applied live via `/proc/fs/nfsd/threads` (no restart required). Optional, default `2 ×` the number of vCPUs.
+
+`nfs_client_rahead` is a mapping of NFS mount type to client-side read-ahead value (in 512-byte blocks), written to the `[nfsrahead]` section of `/etc/nfs.conf` and applied by the `nfsrahead` helper at mount time. Raising it above the stock 128-block default avoids throttling large sequential reads off NFS exports. Set to `{}` to leave `/etc/nfs.conf` untouched. Optional, default `{nfs4: "32768", nfs: "32768", default: "128"}`.
+
 Multiple NFS client/server configurations may be provided by defining `nfs_configurations`. This should be a list of mappings with keys/values are as per the variables above. Omitted keys/values are filled from the corresponding variable. For example if all configurations require the same non-default client mount options, define `nfs_client_mnt_options` and omit the key "nfs_client_mnt_options" from all configuration mappings.
 
 Dependencies
 ------------
 
-None
+The `community.general` Ansible collection - see [Requirements](#requirements).
 
 Example Playbook
 ----------------
