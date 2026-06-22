@@ -5,6 +5,21 @@
     name: "{{ nfs_client_packages }}"
     state: present
 
+# Client-side read-ahead in /etc/nfs.conf. Distinct INI section from
+# the server-side [nfsd] threads setting (nfs-server.yml), so the two
+# coexist without conflict. Applied at mount time by the nfsrahead
+# helper, so existing mounts pick it up on the next (re)mount.
+- name: Configure NFS client read-ahead in /etc/nfs.conf
+  community.general.ini_file:
+    path: /etc/nfs.conf
+    section: nfsrahead
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: true
+    mode: "0644"
+  loop: "{{ nfs_client_rahead | dict2items }}"
+  when: nfs_client_rahead | length > 0
+
 - name: check if mount directory exists
   stat:
     path: "{{ item.get('nfs_client_mnt_point', nfs_client_mnt_point) }}"

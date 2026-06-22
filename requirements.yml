@@ -1,0 +1,4 @@
+---
+collections:
+  # provides community.general.ini_file, used to manage /etc/nfs.conf
+  - name: community.general

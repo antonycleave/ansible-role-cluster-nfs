@@ -19,6 +19,17 @@ nfs_client_mnt_options: "defaults,nosuid,nodev"
 
 nfs_client_mnt_state: mounted
 
+# Client-side read-ahead written to the [nfsrahead] section of
+# /etc/nfs.conf, read by the nfsrahead helper at mount time. Raised
+# well above the stock 128-block default so large sequential reads off
+# NFS exports aren't throttled. Set to {} to leave the file untouched.
+# Coexists with the server-side [nfsd] threads setting (nfs-server.yml):
+# a different INI section, and clients/servers are distinct hosts here.
+nfs_client_rahead:
+  nfs4: "32768"
+  nfs: "32768"
+  default: "128"
+
 nfs_enable:
   server: false
   clients: false
@@ -30,4 +41,5 @@ nfs_configurations:
       clients: false
 
 nfs_server_default:
+nfs_server_num_threads: "{{ ansible_processor_vcpus * 2 }}"
 ...
