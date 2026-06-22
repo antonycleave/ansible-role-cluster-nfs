@@ -40,7 +40,7 @@
 - name: nfs-server-threads
   ansible.builtin.lineinfile:
     insertafter: "[nfsd]"
-    path:  /etc/nfs.conf
+    path: /etc/nfs.conf
     line: threads="{{ nfs_server_num_threads }}"
 
 - name: ensure nfs service is running
@@ -62,6 +62,6 @@
   args:
     executable: /bin/bash
   when: (nfsd_threads.stdout | int) != (nfs_server_num_threads | int)
-  
+
 - name: flush handlers
   meta: flush_handlers
